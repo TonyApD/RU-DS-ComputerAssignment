@@ -199,6 +199,9 @@ def fix_syntax(lines):
 """Finds a closed formula for a homogeneous recurrence relation.
     The return value is a string of the right side of the equation "s(n) = ..."""
 
+from sympy import *
+from sympy.abc import r
+from sympy.parsing.sympy_parser import parse_expr
 
 def solve_homogeneous_equation(init_conditions, associated):
     #Step 1: Rewrite in the default form
@@ -208,25 +211,60 @@ def solve_homogeneous_equation(init_conditions, associated):
         default_form += str(associated[i]) + "s(n - " + str(i) + ")"
         i += 1
     debug_print("Default form: " + default_form)
+
     #Step 2: Determine characteristic equation
     rvergelijking = "r**" + str(len(associated))
     for key in associated:
         if (associated[key])[0] == '+':
             rvergelijking += "-" + ((associated[key])[1:-2])
+            #print("-" + ((associated[key])[1:-2]))
         else:
             rvergelijking += "+" + ((associated[key])[1:-2])
+            #print("+" + ((associated[key])[1:-2]))
 
-        rvergelijking += (associated[key])[:-2]
         if key - 1 > 0:
             rvergelijking += "*r**" + str(key - 1)
-    print(rvergelijking)
+    debug_print("Characteristic equation: " + rvergelijking)
+
     #Step 3: Find roots and multiplicities of characteristic equation
-    """Kan met solve"""
+    solutions = solveset(Eq(parse_expr(rvergelijking), 0), r) #gives only distinct roots
+    solutionsWithMultiplicity = roots(Eq(parse_expr(rvergelijking), 0), r)
+    debug_print("Solutions for characteristic equation: " + str(solutions))
+    debug_print("Roots /w multiplicity: " + str(solutionsWithMultiplicity))
+
+
+
+    #"""Errors are being made somewhere below.. (Only tested on first problem)"""
+
+
+
+
     #Step 4: Write down general solution
     """Een if is nodig voor roots gelijk en alle roots anders!"""
+    generalSolution = ""
+    for i, solution in enumerate(solutions):
+        generalSolution += "+ a" + str(i) + "*(" + str(solution) + ")**n "
+
+    generalSolution = generalSolution[2:]
+    debug_print("Gerneral solution: " + generalSolution)
+
     #Step 5: Use initial conditions to determine values of the parameters
     """Kijken welke waarden voor de alpha's juiste resultaat geven"""
-    return rvergelijking
+    equations = []
+    for n in init_conditions:
+        debug_print( "   |-find alphas-| " + (generalSolution.replace("n", str(n)) + " = " ) + str(init_conditions[n]))
+        exrp = parse_expr(generalSolution.replace("n", str(n)))
+        eq = Eq(exrp, int(init_conditions[n]))
+        equations.append(eq)
+
+    alphaSolutions = solve(equations, symbols('a0:' + str(len(solutions))))
+    solution = "s(n) := " + generalSolution
+    for alphaSolution in alphaSolutions:
+        solution = solution.replace(str(alphaSolution), "(" + str(alphaSolutions[alphaSolution]) + ")")
+
+    debug_print("Final solution: " + solution)
+
+    return solution
 
 
 """Finds a closed formula for a nonhomogeneous equation, where the nonhomogeneous part consists
