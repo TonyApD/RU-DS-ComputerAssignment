@@ -201,8 +201,10 @@ def fix_syntax(lines):
 
 
 def solve_homogeneous_equation(init_conditions, associated):
+    #Step 1: Rewrite in the default form
     print(associated)
-    rvergelijking = "r**" + str(len(associated)) + "-"
+    #Step 2: Determine characteristic equation
+    rvergelijking = "r**" + str(len(associated))
     for key in associated:
         if (associated[key])[0] == '+':
             rvergelijking += "-" + ((associated[key])[1:-2])
@@ -213,6 +215,12 @@ def solve_homogeneous_equation(init_conditions, associated):
         if key - 1 > 0:
             rvergelijking += "*r**" + str(key - 1)
     print(rvergelijking)
+    #Step 3: Find roots and multiplicities of characteristic equation
+    """Kan met solve"""
+    #Step 4: Write down general solution
+    """Een if is nodig voor roots gelijk en alle roots anders!"""
+    #Step 5: Use initial conditions to determine values of the parameters
+    """Kijken welke waarden voor de alpha's juiste resultaat geven"""
     return rvergelijking
 
 
@@ -224,6 +232,13 @@ def solve_homogeneous_equation(init_conditions, associated):
 
 def solve_nonhomogeneous_equation(init_conditions, associated, f_n_list):
     # You have to implement this yourself!
+    #Step 1: Rewrite in the default form
+    #Step 2: Determine characteristic equation
+    #Step 3: Find roots and multiplicities of characteristic equation
+    #Step 4: Find general solution ofthe associated homogeneous system
+    #Step 5: Find a particular solution for step 4
+    #Step 6: Add general solution to particular solution
+    #Step 7: Use initial conditions to determine the exact value of parameters
     return result
 
 
