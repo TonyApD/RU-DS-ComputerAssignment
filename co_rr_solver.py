@@ -199,16 +199,18 @@ def fix_syntax(lines):
 """Finds a closed formula for a homogeneous recurrence relation.
     The return value is a string of the right side of the equation "s(n) = ..."""
 
+
 def solve_homogeneous_equation(init_conditions, associated):
     print(associated)
     rvergelijking = "r**" + str(len(associated)) + " - "
     for key in associated:
         rvergelijking += (associated[key])[:-2]
-        if key-1 > 0:
-            rvergelijking += "*r**" + str(key-1)
-        #print(str(key) + ": " + str(associated[key])[:-2])
+        if key - 1 > 0:
+            rvergelijking += "*r**" + str(key - 1)
+        # print(str(key) + ": " + str(associated[key])[:-2])
         print(rvergelijking)
     return rvergelijking
+
 
 """Finds a closed formula for a nonhomogeneous equation, where the nonhomogeneous part consists
     of a linear combination of constants, "r*n^x" with r a real number and x a positive natural number,
