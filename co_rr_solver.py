@@ -202,7 +202,12 @@ def fix_syntax(lines):
 
 def solve_homogeneous_equation(init_conditions, associated):
     #Step 1: Rewrite in the default form
-    print(associated)
+    default_form = "s(n) = "
+    i = 1
+    while i <= len(associated):
+        default_form += str(associated[i]) + "s(n - " + str(i) + ")"
+        i += 1
+    debug_print("Default form: " + default_form)
     #Step 2: Determine characteristic equation
     rvergelijking = "r**" + str(len(associated))
     for key in associated:
