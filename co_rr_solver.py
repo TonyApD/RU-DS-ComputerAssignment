@@ -201,13 +201,16 @@ def fix_syntax(lines):
 
 def solve_homogeneous_equation(init_conditions, associated):
     print(associated)
-    rvergelijking = "r**" + str(len(associated)) + " - "
+    rvergelijking = "r**" + str(len(associated)) + "-"
     for key in associated:
-        rvergelijking += (associated[key])[:-2]
+        if (associated[key])[0] == '+':
+            rvergelijking += "-" + ((associated[key])[1:-2])
+        else:
+            rvergelijking += "+" + ((associated[key])[1:-2])
+
         if key-1 > 0:
             rvergelijking += "*r**" + str(key-1)
-        #print(str(key) + ": " + str(associated[key])[:-2])
-        print(rvergelijking)
+    print(rvergelijking)
     return rvergelijking
 
 """Finds a closed formula for a nonhomogeneous equation, where the nonhomogeneous part consists
