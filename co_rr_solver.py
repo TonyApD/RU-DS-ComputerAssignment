@@ -216,10 +216,10 @@ def solve_homogeneous_equation(init_conditions, associated):
     rvergelijking = "r**" + str(len(associated))
     for key in associated:
         if (associated[key])[0] == '+':
-            rvergelijking += "-" + ((associated[key])[1:-2])
+            rvergelijking += "+" + ((associated[key])[1:-2])
             #print("-" + ((associated[key])[1:-2]))
         else:
-            rvergelijking += "+" + ((associated[key])[1:-2])
+            rvergelijking += "-" + ((associated[key])[1:-2])
             #print("+" + ((associated[key])[1:-2]))
 
         if key - 1 > 0:
@@ -227,9 +227,9 @@ def solve_homogeneous_equation(init_conditions, associated):
     debug_print("Characteristic equation: " + rvergelijking)
 
     #Step 3: Find roots and multiplicities of characteristic equation
-    solutions = solveset(Eq(parse_expr(rvergelijking), 0), r) #gives only distinct roots
+    #solutions = solveset(Eq(parse_expr(rvergelijking), 0), r) #gives only distinct roots
     solutionsWithMultiplicity = roots(Eq(parse_expr(rvergelijking), 0), r)
-    debug_print("Solutions for characteristic equation: " + str(solutions))
+    #debug_print("Solutions for characteristic equation: " + str(solutions))
     debug_print("Roots /w multiplicity: " + str(solutionsWithMultiplicity))
 
 
@@ -242,11 +242,22 @@ def solve_homogeneous_equation(init_conditions, associated):
     #Step 4: Write down general solution
     """Een if is nodig voor roots gelijk en alle roots anders!"""
     generalSolution = ""
-    for i, solution in enumerate(solutions):
-        generalSolution += "+ a" + str(i) + "*(" + str(solution) + ")**n "
+    numberOfRoots = 0
+    #for i, solution in enumerate(solutions):
+    #    generalSolution += "+ a" + str(i) + "*(" + str(solution) + ")**n "
+    for root in solutionsWithMultiplicity:
+        for i in range(0,solutionsWithMultiplicity[root]):
+            numberOfRoots += i
+            generalSolution += "+ a" + str(i) + "*"
+            if i is 1:
+                generalSolution += "n*"
+            elif i > 1:
+                generalSolution += "n**" + str(i) + "*"
+            generalSolution += "(" + str(root) + ")**n "
 
     generalSolution = generalSolution[2:]
     debug_print("Gerneral solution: " + generalSolution)
+    #debug_print(simplify(parse_expr(generalSolution)))
 
     #Step 5: Use initial conditions to determine values of the parameters
     """Kijken welke waarden voor de alpha's juiste resultaat geven"""
@@ -257,12 +268,14 @@ def solve_homogeneous_equation(init_conditions, associated):
         eq = Eq(exrp, int(init_conditions[n]))
         equations.append(eq)
 
-    alphaSolutions = solve(equations, symbols('a0:' + str(len(solutions))))
-    solution = "s(n) := " + generalSolution
+    alphaSolutions = solve(equations)
+    debug_print("Alpha's: " + str(alphaSolutions))
+
+    solution = "s(n) = " + generalSolution
     for alphaSolution in alphaSolutions:
         solution = solution.replace(str(alphaSolution), "(" + str(alphaSolutions[alphaSolution]) + ")")
 
-    debug_print("Final solution: " + solution)
+    debug_print("Final solution: " + (solution))
 
     return solution
 
