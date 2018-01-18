@@ -155,6 +155,8 @@ def analyze_recurrence_equation(equation):
         associated[step_length] = c_n  # Add the recursive step length and factor to the dictionary
         pos_s = equation.find("s(n-")  # First position of recurrent part (because other "s(n-"-part is already removed)
     # Sorry, but you will have to implement the treatment of F(n) yourself!
+    if len(equation) > 0:
+        f_n_list.append(equation) #What is left is F(n)... But further processing like above is probably required
     return associated, f_n_list
 
 
@@ -203,8 +205,14 @@ from sympy import *
 from sympy.abc import r
 from sympy.parsing.sympy_parser import parse_expr
 
-def solve_homogeneous_equation(init_conditions, associated):
-    #Step 1: Rewrite in the default form
+def solve_polynomial_roots(polynomial):
+    solutionsWithMultiplicity = roots(Eq(parse_expr(polynomial), 0), r)
+    debug_print("Roots /w multiplicity: " + str(solutionsWithMultiplicity))
+    return solutionsWithMultiplicity
+
+
+
+def construct_default_from(associated):
     default_form = "s(n) = "
     i = 1
     while i <= len(associated):
@@ -212,72 +220,98 @@ def solve_homogeneous_equation(init_conditions, associated):
         i += 1
     debug_print("Default form: " + default_form)
 
-    #Step 2: Determine characteristic equation
+
+
+def build_polynomial(associated):
     rvergelijking = "r**" + str(len(associated))
-    for key in associated:
-        if (associated[key])[0] == '+':
-            rvergelijking += "+" + ((associated[key])[1:-2])
-            #print("-" + ((associated[key])[1:-2]))
-        else:
-            rvergelijking += "-" + ((associated[key])[1:-2])
-            #print("+" + ((associated[key])[1:-2]))
 
-        if key - 1 > 0:
-            rvergelijking += "*r**" + str(key - 1)
+    for key in sorted(associated):
+        associated[key] = (associated[key]).split("*")[0]
+
+        #print(str(key) + " : " + str(associated[key]))
+        cpart = negate_c_part(associated[key])
+        #print(str(key) + " : " + str(cpart))
+
+        rvergelijking += cpart
+
+        if (len(associated) - key) > 0:
+            rvergelijking += "*r**" + str((len(associated) - key))
+
     debug_print("Characteristic equation: " + rvergelijking)
-
-    #Step 3: Find roots and multiplicities of characteristic equation
-    #solutions = solveset(Eq(parse_expr(rvergelijking), 0), r) #gives only distinct roots
-    solutionsWithMultiplicity = roots(Eq(parse_expr(rvergelijking), 0), r)
-    #debug_print("Solutions for characteristic equation: " + str(solutions))
-    debug_print("Roots /w multiplicity: " + str(solutionsWithMultiplicity))
+    return rvergelijking
 
 
 
-    #"""Errors are being made somewhere below.. (Only tested on first problem)"""
+def negate_c_part(cpart):
+    if cpart[0] == "-":
+        return "+" + cpart[1:]
+    elif cpart[0] == "+":
+        return "-" + cpart[1:]
+    return "-" + cpart
 
 
 
 
-    #Step 4: Write down general solution
-    """Een if is nodig voor roots gelijk en alle roots anders!"""
+def build_general_solution(solutionsWithMultiplicity):
     generalSolution = ""
-    numberOfRoots = 0
-    #for i, solution in enumerate(solutions):
-    #    generalSolution += "+ a" + str(i) + "*(" + str(solution) + ")**n "
+    #for every root place it it's multiplicity times in the general solution
+    alphaNumber = 0
     for root in solutionsWithMultiplicity:
+        #print("For root: " + str(root))
         for i in range(0,solutionsWithMultiplicity[root]):
-            numberOfRoots += i
-            generalSolution += "+ a" + str(i) + "*"
+            generalSolution += "+ a" + str(alphaNumber) + "*"
             if i is 1:
                 generalSolution += "n*"
             elif i > 1:
                 generalSolution += "n**" + str(i) + "*"
             generalSolution += "(" + str(root) + ")**n "
+            alphaNumber=alphaNumber+1
 
-    generalSolution = generalSolution[2:]
+    generalSolution = generalSolution[2:] #remove the first "+ "
     debug_print("Gerneral solution: " + generalSolution)
-    #debug_print(simplify(parse_expr(generalSolution)))
+    return generalSolution
 
-    #Step 5: Use initial conditions to determine values of the parameters
-    """Kijken welke waarden voor de alpha's juiste resultaat geven"""
+
+def solve_alphas(generalSolution, init_conditions):
     equations = []
     for n in init_conditions:
         debug_print( "   |-find alphas-| " + (generalSolution.replace("n", str(n)) + " = " ) + str(init_conditions[n]))
         exrp = parse_expr(generalSolution.replace("n", str(n)))
         eq = Eq(exrp, int(init_conditions[n]))
         equations.append(eq)
-
     alphaSolutions = solve(equations)
     debug_print("Alpha's: " + str(alphaSolutions))
+    return alphaSolutions
 
-    solution = "s(n) = " + generalSolution
-    for alphaSolution in alphaSolutions:
-        solution = solution.replace(str(alphaSolution), "(" + str(alphaSolutions[alphaSolution]) + ")")
 
-    debug_print("Final solution: " + (solution))
+def insert_alphas_in_solution(alphas, generalSolution):
+    solution = generalSolution
+    for alphaSolution in alphas:
+        solution = solution.replace(str(alphaSolution), "(" + str(alphas[alphaSolution]) + ")")
+    simpleSolution = str(simplify(parse_expr(solution)))
+    debug_print("Simple solution found: " + simpleSolution)
+    return simpleSolution
 
-    return solution
+
+def solve_homogeneous_equation(init_conditions, associated):
+    #Step 1: Rewrite in the default form
+    #construct_default_from(associated)
+
+    #Step 2: Determine characteristic equation
+    polynomial = build_polynomial(associated)
+
+    #Step 3: Find roots and multiplicities of characteristic equation
+    solutionsWithMultiplicity = solve_polynomial_roots(polynomial)
+
+    #Step 4: Write down general solution
+    generalSolution = build_general_solution(solutionsWithMultiplicity)
+
+    #Step 5: Use initial conditions to determine values of the parameters
+    alphaSolutions = solve_alphas(generalSolution, init_conditions)
+    directFormula  = insert_alphas_in_solution(alphaSolutions, generalSolution)
+
+    debug_print("Final solution: S(n)=" + directFormula)
+    return directFormula
 
 
 """Finds a closed formula for a nonhomogeneous equation, where the nonhomogeneous part consists
