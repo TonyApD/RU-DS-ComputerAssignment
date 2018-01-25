@@ -156,7 +156,22 @@ def analyze_recurrence_equation(equation):
         pos_s = equation.find("s(n-")  # First position of recurrent part (because other "s(n-"-part is already removed)
     # Sorry, but you will have to implement the treatment of F(n) yourself!
     if len(equation) > 0:
-        f_n_list.append(equation) #What is left is F(n)... But further processing like above is probably required
+        equation = str(simplify(equation))
+        debug_print("left for F(n): " + equation)
+        pos_s = equation.find("**")
+        while pos_s >= 0:
+            left_pos = search_left_term_begin(equation, pos_s, ["+", "-"])
+            right_pos = search_right_term_end(equation, pos_s, ["+", "-"])
+            c_n = equation[left_pos:right_pos + 1]
+            equation = equation.replace(c_n, "", 1)
+            pos_s = equation.find("**")
+            f_n_list.append(c_n)
+
+        # add a possible remainder of the equation to f(n)
+        if len(equation) > 0:
+            f_n_list.append(equation)
+
+        debug_print("F(n) list: " + str(f_n_list))
     return associated, f_n_list
 
 
@@ -205,11 +220,11 @@ from sympy import *
 from sympy.abc import r
 from sympy.parsing.sympy_parser import parse_expr
 
+
 def solve_polynomial_roots(polynomial):
     solutionsWithMultiplicity = roots(Eq(parse_expr(polynomial), 0), r)
     debug_print("Roots /w multiplicity: " + str(solutionsWithMultiplicity))
     return solutionsWithMultiplicity
-
 
 
 def construct_default_from(associated):
@@ -221,16 +236,15 @@ def construct_default_from(associated):
     debug_print("Default form: " + default_form)
 
 
-
 def build_polynomial(associated):
     rvergelijking = "r**" + str(len(associated))
 
     for key in sorted(associated):
         associated[key] = (associated[key]).split("*")[0]
 
-        #print(str(key) + " : " + str(associated[key]))
+        # print(str(key) + " : " + str(associated[key]))
         cpart = negate_c_part(associated[key])
-        #print(str(key) + " : " + str(cpart))
+        # print(str(key) + " : " + str(cpart))
 
         rvergelijking += cpart
 
@@ -241,7 +255,6 @@ def build_polynomial(associated):
     return rvergelijking
 
 
-
 def negate_c_part(cpart):
     if cpart[0] == "-":
         return "+" + cpart[1:]
@@ -250,24 +263,22 @@ def negate_c_part(cpart):
     return "-" + cpart
 
 
-
-
 def build_general_solution(solutionsWithMultiplicity):
     generalSolution = ""
-    #for every root place it it's multiplicity times in the general solution
+    # for every root place it it's multiplicity times in the general solution
     alphaNumber = 0
     for root in solutionsWithMultiplicity:
-        #print("For root: " + str(root))
-        for i in range(0,solutionsWithMultiplicity[root]):
+        # print("For root: " + str(root))
+        for i in range(0, solutionsWithMultiplicity[root]):
             generalSolution += "+ a" + str(alphaNumber) + "*"
             if i is 1:
                 generalSolution += "n*"
             elif i > 1:
                 generalSolution += "n**" + str(i) + "*"
             generalSolution += "(" + str(root) + ")**n "
-            alphaNumber=alphaNumber+1
+            alphaNumber = alphaNumber + 1
 
-    generalSolution = generalSolution[2:] #remove the first "+ "
+    generalSolution = generalSolution[2:]  # remove the first "+ "
     debug_print("Gerneral solution: " + generalSolution)
     return generalSolution
 
@@ -275,7 +286,7 @@ def build_general_solution(solutionsWithMultiplicity):
 def solve_alphas(generalSolution, init_conditions):
     equations = []
     for n in init_conditions:
-        debug_print( "   |-find alphas-| " + (generalSolution.replace("n", str(n)) + " = " ) + str(init_conditions[n]))
+        debug_print("   |-find alphas-| " + (generalSolution.replace("n", str(n)) + " = ") + str(init_conditions[n]))
         exrp = parse_expr(generalSolution.replace("n", str(n)))
         eq = Eq(exrp, int(init_conditions[n]))
         equations.append(eq)
@@ -294,24 +305,43 @@ def insert_alphas_in_solution(alphas, generalSolution):
 
 
 def solve_homogeneous_equation(init_conditions, associated):
-    #Step 1: Rewrite in the default form
-    #construct_default_from(associated)
+    # Step 1: Rewrite in the default form
+    # construct_default_from(associated)
 
-    #Step 2: Determine characteristic equation
+    # Step 2: Determine characteristic equation
     polynomial = build_polynomial(associated)
 
-    #Step 3: Find roots and multiplicities of characteristic equation
+    # Step 3: Find roots and multiplicities of characteristic equation
     solutionsWithMultiplicity = solve_polynomial_roots(polynomial)
 
-    #Step 4: Write down general solution
+    # Step 4: Write down general solution
     generalSolution = build_general_solution(solutionsWithMultiplicity)
 
-    #Step 5: Use initial conditions to determine values of the parameters
+    # Step 5: Use initial conditions to determine values of the parameters
     alphaSolutions = solve_alphas(generalSolution, init_conditions)
-    directFormula  = insert_alphas_in_solution(alphaSolutions, generalSolution)
+    directFormula = insert_alphas_in_solution(alphaSolutions, generalSolution)
 
     debug_print("Final solution: S(n)=" + directFormula)
     return directFormula
+
+
+"""Builds a particular solution for the f(n) part according to theorem 6. Uses the found roots in the homogeneous part 
+to decide which form the solution should have"""
+
+
+def build_particular_solution(f_n_list, solutionsWithMultiplicity):
+    # First, we try to rewrite to the form F(n) = (b_tn^t...b_0)s^n
+    t = f_n_list[1]
+    s = 1
+    debug_print("Particular solution s = " + str(s))
+    if s in solutionsWithMultiplicity:
+        m = solutionsWithMultiplicity[s]
+        debug_print("Particular solution m = " + str(m))
+        # If s in the solutions, then there exists a solution of the form n^m(b_tn^t...b_0)s^n
+    else:
+        # There exists a solution of the form (b_tn^t...b_0)s^n
+        s = s
+    return f_n_list
 
 
 """Finds a closed formula for a nonhomogeneous equation, where the nonhomogeneous part consists
@@ -322,14 +352,28 @@ def solve_homogeneous_equation(init_conditions, associated):
 
 def solve_nonhomogeneous_equation(init_conditions, associated, f_n_list):
     # You have to implement this yourself!
-    #Step 1: Rewrite in the default form
-    #Step 2: Determine characteristic equation
-    #Step 3: Find roots and multiplicities of characteristic equation
-    #Step 4: Find general solution ofthe associated homogeneous system
-    #Step 5: Find a particular solution for step 4
-    #Step 6: Add general solution to particular solution
-    #Step 7: Use initial conditions to determine the exact value of parameters
-    return result
+    # Step 1: Rewrite in the default form
+
+    # Step 2: Determine characteristic equation
+    polynomial = build_polynomial(associated)
+
+    # Step 3: Find roots and multiplicities of characteristic equation
+    solutionsWithMultiplicity = solve_polynomial_roots(polynomial)
+
+    # Step 4: Find general solution ofthe associated homogeneous system
+    generalSolution = build_general_solution(solutionsWithMultiplicity)
+
+    # Step 5: Find a particular solution for step 4
+    particularSolution = build_particular_solution(f_n_list, solutionsWithMultiplicity)
+
+    # Step 6: Add general solution to particular solution
+    # result = str(generalSolution + particularSolution)
+    result = generalSolution
+
+    # Step 7: Use initial conditions to determine the exact value of parameters
+    alphaSolutions = solve_alphas(result, init_conditions)
+    directFormula = insert_alphas_in_solution(alphaSolutions, result)
+    return directFormula
 
 
 """Transforms the string equation, that is of the right side of the form "s(n) = ...",
