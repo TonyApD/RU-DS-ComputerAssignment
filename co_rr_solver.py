@@ -259,12 +259,13 @@ def construct_default_from(associated):
 
 
 def build_polynomial(associated):
-    rvergelijking = "r**" + str(len(associated))
+    degree = max(associated, key=int)
+    rvergelijking = "r**" + str(degree)
     for key in associated:
-        if key - 1 > 1:
-            rvergelijking += negate_c_part((associated[key]).split("*")[0]) + "* r**" + str(key - 1)
-        elif key - 1 == 1:
-            rvergelijking += negate_c_part((associated[key]).split("*")[0]) + "* r"
+        if degree - key > 1:
+            rvergelijking += negate_c_part((associated[key]).split("*")[0]) + "*r**" + str((degree - key))
+        elif degree - key == 1:
+            rvergelijking += negate_c_part((associated[key]).split("*")[0]) + "*r"
         else:
             rvergelijking += negate_c_part((associated[key]).split("*")[0])
 
@@ -396,32 +397,32 @@ def build_particular_solution(f_n_list, solutionsWithMultiplicity):
 
 
 def solve_nonhomogeneous_equation(init_conditions, associated, f_n_list):
-    # You have to implement this yourself!
-    # Step 1: Rewrite in the default form
-
-    # Step 2: Determine characteristic equation
-    polynomial = build_polynomial(associated)
-
-    # Step 3: Find roots and multiplicities of characteristic equation
-    solutionsWithMultiplicity = solve_polynomial_roots(polynomial)
-
-    # Step 4: Find general solution ofthe associated homogeneous system
-    generalSolution = build_general_solution(solutionsWithMultiplicity)
-
-    # Step 5: Find a particular solution for step 4
-    particularSolution = build_particular_solution(f_n_list, solutionsWithMultiplicity)
-
-    # Step 6: Add general solution to particular solution
-    # result = str(generalSolution + particularSolution)
-    result = generalSolution
-    for f_n_sol in f_n_list:
-        result = str(sympify(result + "+" + f_n_sol))
-
-    # Step 7: Use initial conditions to determine the exact value of parameters
-    alphaSolutions = solve_alphas(result, init_conditions)
-    directFormula = insert_alphas_in_solution(alphaSolutions, result)
-    return directFormula
-
+    # # You have to implement this yourself!
+    # # Step 1: Rewrite in the default form
+    #
+    # # Step 2: Determine characteristic equation
+    # polynomial = build_polynomial(associated)
+    #
+    # # Step 3: Find roots and multiplicities of characteristic equation
+    # solutionsWithMultiplicity = solve_polynomial_roots(polynomial)
+    #
+    # # Step 4: Find general solution ofthe associated homogeneous system
+    # generalSolution = build_general_solution(solutionsWithMultiplicity)
+    #
+    # # Step 5: Find a particular solution for step 4
+    # particularSolution = build_particular_solution(f_n_list, solutionsWithMultiplicity)
+    #
+    # # Step 6: Add general solution to particular solution
+    # # result = str(generalSolution + particularSolution)
+    # result = generalSolution
+    # for f_n_sol in f_n_list:
+    #     result = str(sympify(result + "+" + f_n_sol))
+    #
+    # # Step 7: Use initial conditions to determine the exact value of parameters
+    # alphaSolutions = solve_alphas(result, init_conditions)
+    # directFormula = insert_alphas_in_solution(alphaSolutions, result)
+    # return directFormula
+    return "Not implemented"
 
 """Transforms the string equation, that is of the right side of the form "s(n) = ...",
     and wirtes it towards the file "filename", which also needs to contain the desired path."""
