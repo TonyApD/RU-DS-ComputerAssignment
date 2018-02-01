@@ -103,19 +103,41 @@ def search_left_term_begin(equation, start, symbols):
 """Searches for the right end of the term (beginning at start) and returns the last position belonging to the term.
     The begin of a new term is indicated with one of the symbols in the list "symbols", but only if there are no opened brackets at this position."""
 
-
 def search_right_term_end(equation, start, symbols):
     bracket_count = 0  # Indicating the number of opened bracket-scopes
     index = start
     while index < len(equation):
         if equation[index] == "(":
             bracket_count += 1
-        elif equation[index] == ")":
-            bracket_count -= 1
         elif bracket_count == 0 and equation[index] in symbols and index > 0:
             return index - 1
+        elif equation[index] == ")":
+            bracket_count -= 1
         index += 1
     return len(equation) - 1  # If we got until here the term ends at the end of equation
+
+def reformat_equation(equation):
+    equation = equation.replace("**", "^")
+    pos_sqrt = equation.find("sqrt(")
+    while pos_sqrt >= 0:
+        pos_end = search_right_term_end(equation, pos_sqrt + 5, [')'])
+        equation = "{0}^(1/2){1}".format(equation[0:pos_end + 2], equation[pos_end + 2:])
+        equation = equation.replace("sqrt", "", 1)
+        pos_sqrt = equation.find("sqrt(")
+    return equation
+
+#def search_right_term_end(equation, start, symbols):
+#    bracket_count = 0  # Indicating the number of opened bracket-scopes
+#    index = start
+#    while index < len(equation):
+#        if equation[index] == "(":
+#            bracket_count += 1
+#        elif equation[index] == ")":
+#            bracket_count -= 1
+#        elif bracket_count == 0 and equation[index] in symbols and index > 0:
+#            return index - 1
+#        index += 1
+#    return len(equation) - 1  # If we got until here the term ends at the end of equation
 
 
 """Determines and returns:
@@ -404,15 +426,15 @@ def write_output_to_file(filename, equation):
     The return value is a string of the modified equation."""
 
 
-def reformat_equation(equation):
-    equation = equation.replace("**", "^")
-    pos_sqrt = equation.find("sqrt(")
-    while pos_sqrt >= 0:
-        pos_end = search_right_term_end(equation, pos_sqrt, ["+", "-", "*", "/"])
-        equation = "{0}^(1/2){1}".format(equation[0:pos_end + 1], equation[pos_end + 1:])
-        equation = equation.replace("sqrt", "", 1)
-        pos_sqrt = equation.find("sqrt(")
-    return equation
+#def reformat_equation(equation):
+#    equation = equation.replace("**", "^")
+#    pos_sqrt = equation.find("sqrt(")
+#    while pos_sqrt >= 0:
+#        pos_end = search_right_term_end(equation, pos_sqrt, ["+", "-", "*", "/"])
+#        equation = "{0}^(1/2){1}".format(equation[0:pos_end + 1], equation[pos_end + 1:])
+#        equation = equation.replace("sqrt", "", 1)
+#        pos_sqrt = equation.find("sqrt(")
+#    return equation
 
 
 # Begin of program:
@@ -448,8 +470,7 @@ else:
         tmp = len(lines)
         if lines[len(lines) - 1] == "":
             tmp -= 1
-        init_conditions = det_init_conditions([lines[index] for index in range(1,
-                                                                               tmp)])  # Determine initial conditions with all but the first line as input
+        init_conditions = det_init_conditions([lines[index] for index in range(1, tmp)])  # Determine initial conditions with all but the first line as input
         associated, f_n_list = analyze_recurrence_equation(lines[0])
 
         # Print debugging information:
