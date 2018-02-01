@@ -262,9 +262,9 @@ def build_polynomial(associated):
     rvergelijking = "r**" + str(len(associated))
     for key in associated:
         if key - 1 > 1:
-            rvergelijking += negate_c_part((associated[key]).split("*")[0]) + "r**" + str(key - 1)
+            rvergelijking += negate_c_part((associated[key]).split("*")[0]) + "* r**" + str(key - 1)
         elif key - 1 == 1:
-            rvergelijking += negate_c_part((associated[key]).split("*")[0]) + "r"
+            rvergelijking += negate_c_part((associated[key]).split("*")[0]) + "* r"
         else:
             rvergelijking += negate_c_part((associated[key]).split("*")[0])
 
@@ -286,7 +286,7 @@ def build_polynomial(associated):
     #         rvergelijking += "*r**" + str((len(associated) - key))
 
     debug_print("Characteristic equation: " + rvergelijking)
-    return str(simplify(rvergelijking))
+    return rvergelijking
 
 
 def negate_c_part(cpart):
