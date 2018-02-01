@@ -158,13 +158,13 @@ def analyze_recurrence_equation(equation):
     if len(equation) > 0:
         equation = str(simplify(equation))
         debug_print("left for F(n): " + equation)
-        pos_s = equation.find("**")
+        pos_s = equation.find("**n")
         while pos_s >= 0:
             left_pos = search_left_term_begin(equation, pos_s, ["+", "-"])
             right_pos = search_right_term_end(equation, pos_s, ["+", "-"])
             c_n = equation[left_pos:right_pos + 1]
             equation = equation.replace(c_n, "", 1)
-            pos_s = equation.find("**")
+            pos_s = equation.find("**n")
             f_n_list.append(c_n)
 
         # add a possible remainder of the equation to f(n)
@@ -331,17 +331,26 @@ to decide which form the solution should have"""
 
 def build_particular_solution(f_n_list, solutionsWithMultiplicity):
     # First, we try to rewrite to the form F(n) = (b_tn^t...b_0)s^n
-    t = f_n_list[1]
-    s = 1
+    p_solution = []
+    for f in f_n_list:
+        if "**n" in f:
+            s = f  # s should be the the value before this,
+        else:
+            s = 1  # If form is like (n^t + n2^t-1)s^n then s =1
+
+        debug_print("The f(n) part " + str(f) + " got the following s: " + str(s))
+        if s in solutionsWithMultiplicity:
+            # If s in the solutions, then there exists a solution of the form n^m(b_tn^t...b_0)s^n
+            m = solutionsWithMultiplicity[s]
+            debug_print("Particular solution m = " + str(m))
+            p_solution.append("n**m")
+        else:
+            # There exists a solution of the form (b_tn^t...b_0)s^n
+            p_solution.append("1**n")
+
     debug_print("Particular solution s = " + str(s))
-    if s in solutionsWithMultiplicity:
-        m = solutionsWithMultiplicity[s]
-        debug_print("Particular solution m = " + str(m))
-        # If s in the solutions, then there exists a solution of the form n^m(b_tn^t...b_0)s^n
-    else:
-        # There exists a solution of the form (b_tn^t...b_0)s^n
-        s = s
-    return f_n_list
+
+    return p_solution
 
 
 """Finds a closed formula for a nonhomogeneous equation, where the nonhomogeneous part consists
@@ -369,6 +378,8 @@ def solve_nonhomogeneous_equation(init_conditions, associated, f_n_list):
     # Step 6: Add general solution to particular solution
     # result = str(generalSolution + particularSolution)
     result = generalSolution
+    for f_n_sol in f_n_list:
+        result = str(sympify(result + "+" + f_n_sol))
 
     # Step 7: Use initial conditions to determine the exact value of parameters
     alphaSolutions = solve_alphas(result, init_conditions)
