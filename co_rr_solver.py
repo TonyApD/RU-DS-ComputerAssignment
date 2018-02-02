@@ -180,13 +180,13 @@ def analyze_recurrence_equation(equation):
     if len(equation) > 0:
         equation = str(simplify(equation))
         debug_print("left for F(n): " + equation)
-        pos_s = equation.find("**n")
+        pos_s = equation.find("n**")
         while pos_s >= 0:
             left_pos = search_left_term_begin(equation, pos_s, ["+", "-"])
             right_pos = search_right_term_end(equation, pos_s, ["+", "-"])
             c_n = equation[left_pos:right_pos + 1]
             equation = equation.replace(c_n, "", 1)
-            pos_s = equation.find("**n")
+            pos_s = equation.find("n-**")
             f_n_list.append(c_n)
 
         # add a possible remainder of the equation to f(n)
@@ -259,19 +259,32 @@ def construct_default_from(associated):
 
 
 def build_polynomial(associated):
-    rvergelijking = "r**" + str(len(associated))
+    degree = max(associated, key=int)
+    rvergelijking = "r**" + str(degree)
+    for key in associated:
+        if degree - key > 1:
+            rvergelijking += negate_c_part((associated[key]).split("*")[0]) + "*r**" + str((degree - key))
+        elif degree - key == 1:
+            rvergelijking += negate_c_part((associated[key]).split("*")[0]) + "*r"
+        else:
+            rvergelijking += negate_c_part((associated[key]).split("*")[0])
 
-    for key in sorted(associated):
-        associated[key] = (associated[key]).split("*")[0]
 
-        # print(str(key) + " : " + str(associated[key]))
-        cpart = negate_c_part(associated[key])
-        # print(str(key) + " : " + str(cpart))
 
-        rvergelijking += cpart
+    # rvergelijking = "r**" + str(len(associated))
 
-        if (len(associated) - key) > 0:
-            rvergelijking += "*r**" + str((len(associated) - key))
+
+    # for key in sorted(associated):
+    #     associated[key] = (associated[key]).split("*")[0]
+    #
+    #     # print(str(key) + " : " + str(associated[key]))
+    #     cpart = negate_c_part(associated[key])
+    #     # print(str(key) + " : " + str(cpart))
+    #
+    #     rvergelijking += cpart
+    #
+    #     if (len(associated) - key) > 0:
+    #         rvergelijking += "*r**" + str((len(associated) - key))
 
     debug_print("Characteristic equation: " + rvergelijking)
     return rvergelijking
@@ -355,8 +368,10 @@ def build_particular_solution(f_n_list, solutionsWithMultiplicity):
     # First, we try to rewrite to the form F(n) = (b_tn^t...b_0)s^n
     p_solution = []
     for f in f_n_list:
-        if "**n" in f:
-            s = f  # s should be the the value before this,
+        pos_s = f.find("n**")
+        if pos_s:
+            s = search_left_term_begin(f, pos_s, ["+", "-"])  # s should be the the value before this,
+            debug_print("S was in pos_s" + str(s))
         else:
             s = 1  # If form is like (n^t + n2^t-1)s^n then s =1
 
@@ -382,32 +397,32 @@ def build_particular_solution(f_n_list, solutionsWithMultiplicity):
 
 
 def solve_nonhomogeneous_equation(init_conditions, associated, f_n_list):
-    # You have to implement this yourself!
-    # Step 1: Rewrite in the default form
-
-    # Step 2: Determine characteristic equation
-    polynomial = build_polynomial(associated)
-
-    # Step 3: Find roots and multiplicities of characteristic equation
-    solutionsWithMultiplicity = solve_polynomial_roots(polynomial)
-
-    # Step 4: Find general solution ofthe associated homogeneous system
-    generalSolution = build_general_solution(solutionsWithMultiplicity)
-
-    # Step 5: Find a particular solution for step 4
-    particularSolution = build_particular_solution(f_n_list, solutionsWithMultiplicity)
-
-    # Step 6: Add general solution to particular solution
-    # result = str(generalSolution + particularSolution)
-    result = generalSolution
-    for f_n_sol in f_n_list:
-        result = str(sympify(result + "+" + f_n_sol))
-
-    # Step 7: Use initial conditions to determine the exact value of parameters
-    alphaSolutions = solve_alphas(result, init_conditions)
-    directFormula = insert_alphas_in_solution(alphaSolutions, result)
-    return directFormula
-
+    # # You have to implement this yourself!
+    # # Step 1: Rewrite in the default form
+    #
+    # # Step 2: Determine characteristic equation
+    # polynomial = build_polynomial(associated)
+    #
+    # # Step 3: Find roots and multiplicities of characteristic equation
+    # solutionsWithMultiplicity = solve_polynomial_roots(polynomial)
+    #
+    # # Step 4: Find general solution ofthe associated homogeneous system
+    # generalSolution = build_general_solution(solutionsWithMultiplicity)
+    #
+    # # Step 5: Find a particular solution for step 4
+    # particularSolution = build_particular_solution(f_n_list, solutionsWithMultiplicity)
+    #
+    # # Step 6: Add general solution to particular solution
+    # # result = str(generalSolution + particularSolution)
+    # result = generalSolution
+    # for f_n_sol in f_n_list:
+    #     result = str(sympify(result + "+" + f_n_sol))
+    #
+    # # Step 7: Use initial conditions to determine the exact value of parameters
+    # alphaSolutions = solve_alphas(result, init_conditions)
+    # directFormula = insert_alphas_in_solution(alphaSolutions, result)
+    # return directFormula
+    return "Not implemented"
 
 """Transforms the string equation, that is of the right side of the form "s(n) = ...",
     and wirtes it towards the file "filename", which also needs to contain the desired path."""
