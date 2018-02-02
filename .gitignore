@@ -1,3 +1,5 @@
 .idea/*
 .DS_Store
 venv/*
+Documentation/Documentation_DS_Practical.synctex.gz
+*.gz
