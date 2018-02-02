@@ -20,7 +20,7 @@
 \maketitle
 
 \section{Language}
-The language we used is Python. This is the only sensible choice based on the fact the framework given for the assignment is written in Python. And due to the time frame we don't have time to write our own framework. Also Python has a calculus library Sympy (see next section).
+The language we used is Python. This is the only sensible choice based on the fact the framework given for the assignment is written in Python. And due to the time frame we don't have time to write our own framework. Also Python has a calculus library Sympy (see next section). Since we are allowed to use Simpy, it was the most obvious choice to work with that.
 
 \section{Libraries}
 We use the following libraries:
@@ -30,17 +30,18 @@ We use the following libraries:
 \end{enumerate}
 
 \subsection{Framework}
-The framework pretty much explains its self. 
-We had to implement the parsing of the F(n) our self, after the associated homogeneous part was parsed. We had the following approach: tony jij hebt dit gedaan toch? 
+The framework pretty much explains its self.
+We had to implement the parsing of the F(n) our self, after the associated homogeneous part was parsed. We had the following approach: tony jij hebt dit gedaan toch?
 
 
 \newpage
 
 \subsection{Sympy}
-Homogeneous
-
+Homogeneous\\
+\newline
+\textbf{Step 1} \\
 For implementing the homogeneous part of the algorithm we were able to extract every step into a seperate function. The implementation for solving homogeneous recurrence formulas is as follows:
-\begin{verbatim}
+\begin{lstlisting}
 def solve_homogeneous_equation(init_conditions, associated):
     # Step 1: Rewrite in the default form
 
@@ -59,18 +60,23 @@ def solve_homogeneous_equation(init_conditions, associated):
 
     debug_print("Final solution: S(n)=" + directFormula)
     return directFormula
-\end{verbatim}
-In step 2. we use string operations to construct a polynomial. Based on the associated parts that were already parsed for us by the framework.\\
+\end{lstlisting}
+\textbf{Step 2}\\
+In the second step, we use string operations to construct a polynomial. Based on the associated parts that were already parsed for us by the framework.\\
 \\
-For finding the roots and their multiplicities (step 3) we use sympy:
+\textbf{Step 3}\\
+For finding the roots and their multiplicities we use sympy:
 \begin{verbatim}
     roots(Eq(parse_expr(polynomial), 0), r)
 \end{verbatim}
 We use sympy roots with the equation and the symbol to solve ('r') for finding a key value list with roots and multiplicities. For passing the right equation type we use Eq and pare\_expr to construct a equation that we solve for 0.\\
 \\
-For step 4, we use only some string operations to construct a general solution containing the alphas (a0 ... an) and roots based on their multiplicities.\\
+\textbf{Step 4}\\
+During the fourth step, we use only some string operations to construct a general solution containing the alphas (a0 ... an) and roots based on their multiplicities.\\
 \\
-In step 5, we construct different equations for all the initial conditions. We replace the ns in the general solution from 4 with the n from an initial condition. Next we create an sympy equation Eq with the expression and its expected result.  
+\newpage
+\textbf{Step 5}\\
+With the fifth step, we construct different equations for all the initial conditions. We replace the ns in the general solution from 4 with the n from an initial condition. Next we create an sympy equation Eq with the expression and its expected result.
 \begin{verbatim}
     exrp = parse_expr(generalSolution.replace("n", str(n)))
     eq = Eq(exrp, int(init_conditions[n]))
@@ -85,7 +91,7 @@ We now use string operations to replace all the alphas (a0 .. an) with the value
 \\
 We now have a direct solution for our recurrence relation.
 
-
+\newpage
 \section{Problems and solutions}
 Problem 1:
 
