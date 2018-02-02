@@ -180,13 +180,13 @@ def analyze_recurrence_equation(equation):
     if len(equation) > 0:
         equation = str(simplify(equation))
         debug_print("left for F(n): " + equation)
-        pos_s = equation.find("n**")
+        pos_s = equation.find("**n")
         while pos_s >= 0:
             left_pos = search_left_term_begin(equation, pos_s, ["+", "-"])
             right_pos = search_right_term_end(equation, pos_s, ["+", "-"])
             c_n = equation[left_pos:right_pos + 1]
             equation = equation.replace(c_n, "", 1)
-            pos_s = equation.find("n-**")
+            pos_s = equation.find("**n")
             f_n_list.append(c_n)
 
         # add a possible remainder of the equation to f(n)
