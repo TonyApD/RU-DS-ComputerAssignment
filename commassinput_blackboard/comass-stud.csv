@@ -1,0 +1,101 @@
+Index,Homogeneous,Degree,Nonhomogeneous type
+00,false,3,"exponential"
+01,true,1,
+02,true,2,
+03,true,2,
+04,true,2,
+05,true,2,
+06,true,10,
+07,true,2,
+08,true,2,
+09,false,1,"constant"
+10,true,1,
+11,true,2,
+12,true,2,
+13,true,2,
+14,true,3,
+15,false,1,"exponential"
+16,false,4,"polynomial"
+17,false,4,"(product of polynomial, exponential)"
+18,false,4,"(sum of (product of exponential, polynomial), (product of constant, exponential))"
+19,false,4,"constant"
+20,false,4,"exponential"
+21,false,4,"exponential"
+22,false,4,"(product of polynomial, exponential)"
+23,false,1,"polynomial"
+24,false,2,"(product of constant, exponential)"
+25,false,2,"(sum of constant, exponential, polynomial)"
+26,false,2,"polynomial"
+27,false,2,"polynomial"
+28,false,2,"constant"
+29,false,3,"polynomial"
+30,false,3,"polynomial"
+31,false,3,"polynomial"
+32,false,5,"polynomial"
+33,false,5,"polynomial"
+34,false,4,"polynomial"
+35,false,4,"(sum of constant, (product of constant, exponential))"
+36,false,4,"(sum of constant, (product of constant, exponential))"
+37,false,1,"(sum of constant, (product of constant, exponential))"
+38,false,2,"exponential"
+39,false,1,"polynomial"
+40,false,7,"(sum of constant, (product of constant, exponential))"
+41,true,8,
+42,false,8,"polynomial"
+43,true,3,
+44,false,3,"(sum of exponential, exponential)"
+45,false,3,"(sum of exponential, exponential, polynomial, polynomial)"
+46,true,2,
+47,false,2,"polynomial"
+48,false,2,"polynomial"
+49,false,2,"polynomial"
+50,true,4,
+51,false,4,"polynomial"
+52,false,4,"(sum of polynomial, constant, (product of constant, exponential))"
+53,true,1,
+54,false,1,"(sum of exponential, (product of constant, exponential))"
+55,false,1,"polynomial"
+56,false,2,"polynomial"
+57,false,2,"polynomial"
+58,true,2,
+59,true,7,
+60,false,7,"exponential"
+61,false,7,"polynomial"
+62,false,7,"(sum of (product of constant, exponential), polynomial, polynomial)"
+63,true,4,
+64,false,4,"(sum of exponential, constant)"
+65,false,4,"polynomial"
+66,false,2,"(sum of constant, exponential, exponential, polynomial)"
+67,false,2,"polynomial"
+68,true,9,
+69,false,9,"(product of constant, exponential)"
+70,false,9,"(sum of polynomial, (product of constant, exponential), polynomial, constant)"
+71,true,2,
+72,false,2,"polynomial"
+73,false,2,"exponential"
+74,true,3,
+75,false,3,"(sum of exponential, exponential, exponential)"
+76,false,3,"polynomial"
+77,false,3,"polynomial"
+78,false,3,"exponential"
+79,false,2,"(product of constant, exponential)"
+80,false,2,"(sum of exponential, polynomial)"
+81,true,6,
+82,false,6,"exponential"
+83,false,6,"(sum of (product of constant, exponential), polynomial)"
+84,true,2,
+85,false,2,"exponential"
+86,false,2,"exponential"
+87,true,6,
+88,false,6,"polynomial"
+89,false,6,"(sum of exponential, constant, polynomial, polynomial)"
+90,false,4,"(sum of polynomial, exponential)"
+91,false,4,"(sum of exponential, exponential)"
+92,false,1,"polynomial"
+93,true,5,
+94,false,5,"polynomial"
+95,false,5,"(sum of polynomial, polynomial, (product of constant, exponential))"
+96,true,3,
+97,false,3,"polynomial"
+98,false,3,"polynomial"
+99,false,3,"(sum of constant, polynomial, exponential)"
